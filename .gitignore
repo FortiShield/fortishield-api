@@ -1,0 +1,28 @@
+
+# NodeJS
+node_modules
+
+
+# Temp files
+scripts/*.tmp
+
+# Documentation
+doc/build/
+
+# Python
+*.pyc
+*.egg-info
+*.egg
+
+# Framework
+framework/docs/build/
+framework/dist/
+framework/build/
+framework/lib/
+
+# Installation files
+configuration/auth/htpasswd
+
+# Vagrant folder
+test/environment/vagrant/.vagrant
+test/environment/vagrant/*.log
