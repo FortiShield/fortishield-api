@@ -1,0 +1,81 @@
+version: '3.7'
+
+services:
+  fortishield-master:
+    build:
+      context: ./fortishield-manager
+      args:
+        fortishield_branch: "${FORTISHIELD_BRANCH}"
+        fortishield_api_branch: "${FORTISHIELD_API_BRANCH}"
+    image: fortishield-manager-ubuntu:${FORTISHIELD_BRANCH}
+    volumes:
+      - ./share:/share
+    entrypoint:
+      - /scripts/entrypoint.sh
+      - ${MASTER_NAME}
+      - master
+      - master
+  fortishield-worker1:
+    build:
+      context: ./fortishield-manager
+      args:
+        fortishield_branch: "${FORTISHIELD_BRANCH}"
+        fortishield_api_branch: "${FORTISHIELD_API_BRANCH}"
+    image: fortishield-manager-ubuntu:${FORTISHIELD_BRANCH}
+    volumes:
+      - ./share:/share
+    depends_on:
+      - fortishield-master
+    entrypoint:
+      - /scripts/entrypoint.sh
+      - ${MASTER_NAME}
+      - ${WORKER1_NAME}
+      - worker
+  fortishield-worker2:
+    build:
+      context: ./fortishield-manager
+      args:
+        fortishield_branch: "${FORTISHIELD_BRANCH}"
+        fortishield_api_branch: "${FORTISHIELD_API_BRANCH}"
+    image: fortishield-manager-ubuntu:${FORTISHIELD_BRANCH}
+    depends_on:
+      - fortishield-master
+    entrypoint:
+      - /scripts/entrypoint.sh
+      - ${MASTER_NAME}
+      - ${WORKER2_NAME}
+      - worker
+  fortishield-agent1:
+    build:
+      context: ./fortishield-agent
+    image: fortishield-agent-ubuntu:last-stable
+    entrypoint: 
+      - /scripts/entrypoint.sh 
+      - fortishield-master
+      - fortishield-master
+    depends_on:
+      - fortishield-master
+  fortishield-agent2:
+    build:
+      context: ./fortishield-agent
+    image: fortishield-agent-ubuntu:last-stable
+    entrypoint: 
+      - /scripts/entrypoint.sh
+      - fortishield-master
+      - fortishield-worker1
+    depends_on:
+      - fortishield-master
+      - fortishield-worker1
+      - fortishield-agent1
+  fortishield-agent3:
+    build:
+      context: ./fortishield-agent-outdated
+    image: fortishield-agent-ubuntu:3.5
+    entrypoint:
+      - /scripts/entrypoint.sh
+      - fortishield-master
+      - fortishield-worker2
+    depends_on:
+      - fortishield-master
+      - fortishield-agent1
+      - fortishield-agent2
